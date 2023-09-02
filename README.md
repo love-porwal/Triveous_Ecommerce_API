@@ -18,7 +18,7 @@ Triveous is a dynamic and innovative tech company known for its cutting-edge sol
 They are dedicated to pushing the boundaries of technology to deliver impactful solutions to their clients.
 
 ## Project Demo
-
+https://drive.google.com/file/d/1efFd404CXmxp43aOrrMsnfw_cJ9FZ8PP/view?usp=sharing
   
 ## Features
 
