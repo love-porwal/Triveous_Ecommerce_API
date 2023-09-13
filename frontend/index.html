@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Place Your Order</title>
+    <link rel="stylesheet" href="style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+
+<body>
+    <h1>OTP validation with Rate limiter</h1>
+    <button id="generate-otp">Generate OTP</button>
+    <form id="orderForm">
+        <label for="otp">Enter OTP:</label>
+        <input type="text" id="otp" name="otp" required />
+        <button type="submit" id="verify-otp">Verify OTP</button>
+    </form>
+</body>
+</html>
+<script src="./script.js"></script>

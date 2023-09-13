@@ -1,8 +1,13 @@
 const express = require("express");
+const { client } = require("../config/db");
 const { auth } = require("../middleware/auth.middleware");
+const { OTP } = require("../middleware/otp.middleware");
+const { rateLimit } = require("../middleware/rateLimiter.middleware");
 const { OrderModel } = require("../models/order.model");
 const { CartModel } = require("../models/cart.model");
+const { uuid } = require('uuidv4');
 const OrderRouter = express.Router();
+
 
 /**
  * @swagger
@@ -86,10 +91,40 @@ const OrderRouter = express.Router();
  *         description: Unauthorized - JWT token required.
  */
 
+function generateOTP() {
+  return Math.floor(100000 + Math.random() * 900000);
+}
+
+let generatedOTP;
+
+OrderRouter.get("/generate-otp", auth, rateLimit, async (req, res) => {
+  try {
+    const Id = uuid();
+    generatedOTP = generateOTP();
+    console.log(`Generated OTP: ${generatedOTP}`);
+    await client.set(Id, generatedOTP);
+    console.log("userId:",Id);
+    res.status(200).json({ message: "OTP generated successfully", ok: true ,Id});
+  } catch (error) {
+    res.send({ msg: error.message });
+  }
+});
+
+OrderRouter.post("/verified-otp", auth, OTP, async (req, res) => {
+  try {
+    console.log({ message: "OTP verified successfully" });
+    res
+      .status(200)
+      .json({ message: "OTP verified successfully", success: true });
+  } catch (error) {
+    res.send({ msg: error.message });
+  }
+});
+
 OrderRouter.post("/order-place", auth, async (req, res) => {
   try {
-    const userId = req.userData.userId;
-
+    const userId = req.user.userId;
+    console.log(userId);
     const cart = await CartModel.findOne({ user: userId }).populate(
       "products.product"
     );
@@ -119,15 +154,16 @@ OrderRouter.post("/order-place", auth, async (req, res) => {
 
     res.status(201).json({ message: " Your order placed successfully" });
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Unable to place order something went wrong" });
+    res.status(500).json({
+      err: error.message,
+      message: "Unable to place order something went wrong",
+    });
   }
 });
 
 OrderRouter.get("/order-details", auth, async (req, res) => {
   try {
-    const userId = req.userData.userId;
+    const userId = req.user.userId;
 
     const orders = await OrderModel.find({ user: userId })
       .populate("items.product")
@@ -141,7 +177,7 @@ OrderRouter.get("/order-details", auth, async (req, res) => {
 
 OrderRouter.get("/order/:orderId", auth, async (req, res) => {
   try {
-    const userId = req.userData.userId;
+    const userId = req.user.userId;
     const orderId = req.params.orderId;
 
     const order = await OrderModel.findOne({

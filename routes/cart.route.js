@@ -147,7 +147,7 @@ const CartRouter = express.Router();
 
 CartRouter.post("/addtocart/:productId", auth, async (req, res) => {
   try {
-    const userId = req.userData.userId;
+    const userId = req.user.userId;
     const productId = req.params.productId;
 
     // Find the user's cart
@@ -184,7 +184,7 @@ CartRouter.post("/addtocart/:productId", auth, async (req, res) => {
 
 CartRouter.delete("/removetocart/:productId", auth, async (req, res) => {
   try {
-    const userId = req.userData.userId; // Get the user ID from the auth middleware
+    const userId = req.user.userId; // Get the user ID from the auth middleware
     const productId = req.params.productId; // Get the product ID from the route parameter
 
     // Find the user's cart
@@ -215,7 +215,7 @@ CartRouter.delete("/removetocart/:productId", auth, async (req, res) => {
 
 CartRouter.get("/allcart", auth, async (req, res) => {
   try {
-    const userId = req.userData.userId; // Get the user ID from the auth middleware
+    const userId = req.user.userId; // Get the user ID from the auth middleware
 
     // Find the user's cart
     const cart = await CartModel.findOne({ user: userId }).populate(
@@ -233,9 +233,9 @@ CartRouter.get("/allcart", auth, async (req, res) => {
 });
 
 // Route to increase the quantity of a product in the cart
-CartRouter.post("/increment/:productId", auth, async (req, res) => {
+CartRouter.patch("/increment/:productId", auth, async (req, res) => {
   try {
-    const userId = req.userData.userId; // Get the user ID from the auth middleware
+    const userId = req.user.userId; // Get the user ID from the auth middleware
     const productId = req.params.productId; // Get the product ID from the route parameter
 
     // Find the user's cart
@@ -263,9 +263,9 @@ CartRouter.post("/increment/:productId", auth, async (req, res) => {
 });
 
 // Route to decrease the quantity of a product in the cart
-CartRouter.post("/decrement/:productId", auth, async (req, res) => {
+CartRouter.patch("/decrement/:productId", auth, async (req, res) => {
   try {
-    const userId = req.userData.userId; // Get the user ID from the auth middleware
+    const userId = req.user.userId; // Get the user ID from the auth middleware
     const productId = req.params.productId; // Get the product ID from the route parameter
 
     // Find the user's cart

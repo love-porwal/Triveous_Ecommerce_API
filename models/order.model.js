@@ -12,7 +12,9 @@ const orderSchema = new mongoose.Schema({
       quantity: { type: Number, required: true },
     },
   ],
+  // orderStatus:{type: String, default:"ordered"},
   orderDate: { type: Date, default: Date.now },
+ 
   totalOrderValue: { type: Number, required: true },
 });
 
