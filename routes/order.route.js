@@ -103,8 +103,8 @@ OrderRouter.get("/generate-otp", auth, rateLimit, async (req, res) => {
     generatedOTP = generateOTP();
     console.log(`Generated OTP: ${generatedOTP}`);
     await client.set(Id, generatedOTP);
-    console.log("userId:",Id);
-    res.status(200).json({ message: "OTP generated successfully", ok: true ,Id});
+    console.log("userId:", Id);
+    res.status(200).json({ message: "OTP generated successfully", ok: true, Id });
   } catch (error) {
     res.send({ msg: error.message });
   }
@@ -144,6 +144,10 @@ OrderRouter.post("/order-place", auth, async (req, res) => {
         product: item.product._id,
         quantity: item.quantity,
       })),
+      orderStatus: [{
+        status: "Order placed",
+        description: "order is placed successfully"
+      }],
       totalOrderValue: totalOrderValue,
     });
 
@@ -175,6 +179,8 @@ OrderRouter.get("/order-details", auth, async (req, res) => {
   }
 });
 
+
+
 OrderRouter.get("/order/:orderId", auth, async (req, res) => {
   try {
     const userId = req.user.userId;
@@ -194,5 +200,46 @@ OrderRouter.get("/order/:orderId", auth, async (req, res) => {
     res.status(500).json({ message: "An error occurred" });
   }
 });
+
+OrderRouter.patch("/updateStatus", auth, async (req, res) => {
+  try {
+    const status = req.query.status
+    const orderId = req.query.orderId
+    const shipment = await OrderModel.findOne({ _id: orderId })
+    let obj = {}
+    let arr = shipment.orderStatus;
+    let count =0;
+    for (let item in arr) {
+      if(arr[item].status == status){
+        count++;
+      }
+    }
+    console.log(count);
+    console.log(obj)
+    if (status == "confirmed" ) {
+      obj.status = "confirmed"
+      obj.description = "Order is confirmed by the seller"
+    } else if (status == "payment confirmed") {
+      obj.status = "payment confirmed"
+      obj.description = "Payment is confirmed"
+    } else if (status == "Delivered successfully") {
+      obj.status = "Delivered successfully"
+      obj.description = "Order delivered successfully"
+    }
+    console.log(obj);
+    if (count!==0) {
+      res.status(200).json({ message: "Order status already updated" });
+    } else {
+      shipment.orderStatus.push(obj);
+      // console.log(shipment);
+      await shipment.save()
+      res.status(200).json({ message: "Order status updated" });
+    }
+
+  } catch (error) {
+    res.status(500).json({ message: "An error occurred" });
+  }
+})
+
 
 module.exports = { OrderRouter };
